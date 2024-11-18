@@ -1,0 +1,28 @@
+version: '3.6'
+
+services:
+
+  spring-demo:
+    image: jurajveverka/spring-demo:1.0.4
+    ports:
+      - 8088:8081
+    labels:
+      logformatting: json
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.labels.services == true
+    networks:
+      - application
+    healthcheck:
+      test: curl -f -s http://localhost:8081/health/test | jq -r '.status' | grep UP || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  application:
+    external: true
+    name: app-network
